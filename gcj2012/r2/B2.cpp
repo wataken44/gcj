@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <limits>
 #include <map>
 #include <memory>
 #include <queue>
@@ -23,6 +24,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <time.h>
 
 typedef int int_type;
 
@@ -56,80 +58,151 @@ template<typename T> string to_s(const set<T>& v);
 template<typename F, typename S> string to_s(const pair<F,S>& v);
 template<typename K, typename V> string to_s(const map<K,V>& v);
 
+static const double EPS = 1e-4;
+
+struct Person {
+  int i;
+  int r;
+  double y;
+  double x;
+};
+
+class IComp {
+ public:
+  IComp(){};
+  bool operator()(const Person& lhs, const Person& rhs)
+  {
+    return lhs.i < rhs.i;
+  }
+};
+
+class RComp {
+ public:
+  RComp(){};
+  bool operator()(const Person& lhs, const Person& rhs)
+  {
+    return lhs.r > rhs.r;
+  }
+};
+
+double drand()
+{
+  return rand() * 1.0 / ((unsigned long long)RAND_MAX + 1ULL);
+}
+
+double dist(double y0, double x0, double y1, double x1)
+{
+  double xx = x1 - x0;
+  double yy = y1 - y0;
+  return sqrt(yy * yy + xx * xx);
+}
+
+int nearest(int k, vector<Person>& p)
+{
+  int mi = k;
+  double md = DBL_MAX;
+
+  FOR(i, 0, k) {
+    double d = dist(p[i].y, p[i].x, p[k].y, p[k].x);
+    if(d < p[i].r + p[k].r + EPS) return -1;
+
+    if(md < d) {
+      mi = i;
+      md = d;
+    }
+  }
+  return mi;
+}
+
+void place(int k, int w, int l, vector<Person>& p)
+{
+  double xx = w * drand();
+  double yy = l * drand();
+  int ni = -1;
+  
+  while(true) {
+    p[k].x = xx;
+    p[k].y = yy;
+
+    ni = nearest(k, p);
+    if(ni != -1) break;
+    xx = w * drand();
+    yy = l * drand();
+  }
+}
+
+string solve(int n, int w, int l, vector<int> r)
+{  
+  srand(time(0));
+  
+  vector<Person> p;
+  TIMES(i, n) {
+    Person pp = {i, r[i], 0, 0};
+    p.push_back(pp);
+  }
+
+  sort(p.begin(), p.end(), RComp());
+
+  p[0].x = 0;
+  p[0].y = 0;
+
+  FOR(k, 1, n) {
+    place(k, w, l, p);
+  }
+
+  sort(p.begin(), p.end(), IComp());
+
+  /*
+  cout.setf(std::ios_base::fixed);
+  DUMP(w);DUMP(l);
+  TIMES(i, n) {
+    cout << p[i].i << " " << p[i].r << " " << p[i].x << " " << p[i].y << endl;
+  }
+  TIMES(i, n) {
+    FOR(k, i + 1, n) {
+      if(i == k) continue;
+      double d = dist(p[i].y, p[i].x, p[k].y, p[k].x);
+      if(d < p[i].r + p[k].r + EPS) {
+        cout << "NG: " << i << " " << k << " " << d << " " << p[i].r + p[k].r << endl;
+        cout << p[i].i << " " << p[i].r << " " << p[i].x << " " << p[i].y << endl;
+        cout << p[k].i << " " << p[k].r << " " << p[k].x << " " << p[k].y << endl;
+        
+      }
+    }
+  }
+  */
+  
+  ostringstream oss;
+
+  oss.setf(std::ios_base::fixed);
+  TIMES(i, n) {
+    oss << p[i].x << " " << p[i].y ;
+    if(i != n-1 ) oss << " "; 
+  }
+  
+  return oss.str();
+}
 
 int main(int argc, char *argv[])
 {
-  int tt;
-  cin >> tt;
 
-  TIMES(ti, tt) {
-    double dist;
-    cin >> dist;
+  int t;
+  cin >> t;
 
-    int nc, ac;
-    cin >> nc;
-    cin >> ac;
+  UPTO(tt, 1, t) {
 
-    vector<double> t;
-    vector<double> x;
+    int n, w, l;
+    cin >> n >> w >> l;
+
+    vector<int> r;
+    TIMES(k, n) {
+      int rr;
+      cin >> rr;
+      r.push_back(rr);
+    }
     
-    TIMES(n, nc) {
-      double tt, xx;
-      cin >> tt;
-      cin >> xx;
+    cout << "Case #" << tt << ": " << solve(n, w, l, r) << endl;
 
-      t.push_back(tt);
-      x.push_back(xx);
-    }
-
-    vector<double> a;
-    TIMES(i, ac) {
-      double aa;
-      cin >> aa;
-      a.push_back(aa);
-    }
-
-    cout << "Case #" << ti + 1 << ":" << endl;
-    
-    TIMES(i, ac) {
-      double acc = a[i];
-
-      vector<double> mv;
-      mv.push_back(0);
-
-      FOR(k, 1, t.size()) {
-        mv.push_back(t[k] - );
-      }
-      
-      int np = 0;
-      int nv = 0;
-
-      FOR(k, 1, t.size()) {
-        int dt = t[k] - t[k-1];
-        int fp = np + nv * dt + 0.5 * acc * dt * dt;
-
-        if(fp > x[k]) {
-          np = x[k];
-          nv = (x[k] - x[k - 1]) * 1.0 / (t[k] - t[k-1]);
-        }else {
-          np = fp;
-          nv = nv + acc * dt;
-        }
-      }
-
-      double r = t.back();
-
-      if(np < dist) {
-        double rd = dist - np;
-
-        // rd = nv * rt + 0.5 * acc * rt * rt
-        double rt = (-nv + sqrt(nv * nv + acc * rd)) / acc;
-
-        r += rt;
-      }
-      
-      cout << setprecision(6) << r << endl;
-    }
     
   }
   
