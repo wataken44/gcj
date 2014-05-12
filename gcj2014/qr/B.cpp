@@ -51,11 +51,38 @@ template<typename T> string to_s(const set<T>& v);
 template<typename F, typename S> string to_s(const pair<F,S>& v);
 template<typename K, typename V> string to_s(const map<K,V>& v);
 
-template<typename T> vector<T> read_vector(int n);
 
 int main(int argc, char *argv[])
 {
-  
+  int t = 0;
+  cin >> t;
+  /*
+    buy n factory
+    c / 2 + c / (2 + f) + .. + c / (2 + (n-1)f) + x / (c + nf)
+   */
+
+  UPTO(tt, 1, t) {
+    cout << "Case #" << tt << ": ";
+    double c, f, x;
+    cin >> c >> f >> x;
+
+    int n = ceil(x) + 1;
+    vector<double> sec(n);
+
+    sec[0] = x / 2.0;
+    
+    double p = 0;
+    UPTO(nn, 1, n-1) {
+      double a = c / (2 + (nn - 1) * f);
+      p += a;
+      double s = p + x / (2 + nn * f);
+      sec[nn] = s;
+    }
+
+    sort(sec.begin(), sec.end());
+    cout << fixed << setprecision(7) << sec[0] << endl;
+    
+  }  
   return 0;
 }
 
@@ -68,9 +95,3 @@ template<typename T> string to_s(const list<T>& v) { ostringstream oss; oss << "
 template<typename T> string to_s(const set<T>& v) { ostringstream oss; oss << "{"; EACH(v,i) oss << to_s(*i) << ","; oss << "}"; return oss.str(); }
 template<typename F, typename S> string to_s(const pair<F,S>& v) { ostringstream oss; oss << "<" << to_s(v.first) << " " << to_s(v.second) << ">"; return oss.str(); }
 template<typename K, typename V> string to_s(const map<K,V>& v) { ostringstream oss; oss << "{"; EACH(v,i) oss << to_s(i->first) << " => " << to_s(i->second) << ","; oss << "}"; return oss.str(); }
-
-template<typename T> vector<T> read_vector(int n) {
-  vector<T> r(n);
-  TIMES(nn, n) { T tmp; cin>>tmp; r[nn] = tmp; };
-  return r;
-}

@@ -1,3 +1,8 @@
+
+/*
+  B.cpp
+ */
+
 #include <algorithm>
 #include <cfloat>
 #include <climits>
@@ -53,8 +58,112 @@ template<typename K, typename V> string to_s(const map<K,V>& v);
 
 template<typename T> vector<T> read_vector(int n);
 
+bool is_binary_tree(int n, vector<int> x, vector<int> y, int mask)
+{
+  vector<int> node;
+  list< pair<int, int> > edge;
+  TIMES(i, x.size()) {
+    if( (mask & (1 << x[i])) == 0 && (mask & (1 << y[i])) == 0 ) {
+      edge.push_back(make_pair(x[i], y[i]));
+    }
+  }
+  TIMES(i, n) {
+    if((mask & (1 << i)) == 0) {
+      node.push_back(i);
+    }
+  }
+  //cout << "" << endl ;
+  //DUMP(x); DUMP(y); DUMP(mask);DUMP(node);DUMP(edge);
+  
+  vector<int> ne(n, 0);
+  EACH(edge, e) {
+    ++ne[ e->first ];
+    ++ne[ e->second ];
+  };
+  
+  int head = -1;
+  TIMES(i, n) {
+    if(ne[i] == 2) {
+      if(head != -1) { return false; }
+      head = i;
+    }
+  }
+  if(head == -1) { return false; };
+  //DUMP(head);
+
+  vector<int> used(n, 0);
+  TIMES(i, n) {
+    if( (mask & (1 << i)) != 0 ) { used[i] = 1; }
+  }
+
+  list<int> queue;
+  queue.push_back(head);
+  while(!queue.empty()) {
+    int front = queue.front();
+    queue.pop_front();
+    used[front] = 1;
+    
+    int cnt = 0;
+    EACH(edge, e) {
+      if(e->first == front || e->second == front) {
+        ++cnt;
+      }
+    }
+    //DUMP(front);DUMP(cnt);DUMP(edge);
+    if(!(cnt == 0 || cnt == 2)) {
+      return false;
+    }
+    for(typename list< pair<int, int> >::iterator e = edge.begin(); e != edge.end();) {
+      if(e->first == front || e->second == front) {
+        if(e->first != front) {
+          queue.push_back(e->first);
+        }else {
+          queue.push_back(e->second);
+        }
+        e = edge.erase(e);
+      }else {
+        ++e;
+      }
+    }
+  }
+
+  TIMES(i, used.size()) {
+    if(used[i] == 0) { return false; }
+  }
+  
+  return true;
+}
+
 int main(int argc, char *argv[])
 {
+  int t;
+  cin >> t;
+
+  UPTO(tt, 1, t) {
+    cout << "Case #" << tt << ": " ;
+    int n;
+    cin >> n;
+    int r = n;
+    vector<int> x, y;
+    TIMES(nn, n-1) {
+      int xi, yi;
+      cin >> xi>> yi;
+      x.push_back(xi-1); y.push_back(yi-1);
+    }
+    TIMES(m, 1 << n) {
+      bool can = is_binary_tree(n, x, y, m);
+      if(can) {
+        int c = 0;
+        int mm = m;
+        while(mm > 0) {
+          c += (mm & 1);
+          mm /= 2;
+        }
+        r = min(c, r);
+      }
+    }
+    cout << r << endl;
+  }
   
   return 0;
 }

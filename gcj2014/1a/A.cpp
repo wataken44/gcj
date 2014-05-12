@@ -55,6 +55,62 @@ template<typename T> vector<T> read_vector(int n);
 
 int main(int argc, char *argv[])
 {
+  int t;
+  cin >> t;
+  TIMES(tt, t) {
+    cout << "Case #" << tt + 1 << ": " ;
+    int n, l;
+    cin >> n >> l;
+
+    vector<string> ini = read_vector<string>(n);
+    vector<string> rec = read_vector<string>(n);
+
+    sort(ini.begin(), ini.end());
+
+    int r = l + 100;
+    
+    do {
+      unsigned long long mask = 0;
+      //DUMP(ini);
+      //DUMP(rec);
+      TIMES(ll, l) {
+        if(ini[0][ll] != rec[0][ll]) {
+          mask = mask | (1 << ll);
+        }
+      }
+      //DUMP(mask);
+      
+      bool ok = true;
+      TIMES(nn, n) {
+        TIMES(ll, l) {
+          if( 0 < (mask & (1 << ll)) ) {
+            // should be different
+            if(ini[nn][ll] == rec[nn][ll]) { ok = false; }
+          }else {
+            // should be same
+            if(ini[nn][ll] != rec[nn][ll]) { ok = false; }
+          }
+        }
+      }
+
+      if(ok) {
+        int rr = 0;
+        TIMES(ll, l) {
+          if(ini[0][ll] != rec[0][ll]) {
+            rr += 1;
+          }
+        }
+        r = min(r, rr);
+      }
+      
+    }while(next_permutation(ini.begin(), ini.end()));
+    if(r > l) {
+      cout << "NOT POSSIBLE";
+    }else {
+      cout << r;
+    }
+    cout << endl;
+  }
   
   return 0;
 }

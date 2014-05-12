@@ -53,8 +53,61 @@ template<typename K, typename V> string to_s(const map<K,V>& v);
 
 template<typename T> vector<T> read_vector(int n);
 
+bool is_valid(vector<string>& train)
+{
+  vector<int> oc(256, 0);
+  ostringstream oss;
+  TIMES(k, train.size()) { oss << train[k] ; }
+  string tr = oss.str();
+
+  char prev = ' ';
+  TIMES(k, tr.size()) {
+    if(prev != tr[k]) {
+      if(oc[tr[k]] != 0) {
+        // second occurence
+        return false;
+      }
+      oc[tr[k]] = 1;
+    }
+    prev = tr[k];
+  }
+  
+  return true;
+}
+
 int main(int argc, char *argv[])
 {
+  int t;
+  cin >> t;
+
+  UPTO(tt, 1, t) {
+    cout << "Case #" << tt << ": " ;
+
+    int n;
+    cin >> n;
+    vector<string> train = read_vector<string>(n);
+    sort(train.begin(), train.end());
+    
+    long r = 0;
+    do {
+      if(is_valid(train)) { ++r; }
+    } while(next_permutation(train.begin(), train.end()));
+
+    map<string, int> cnt;
+    TIMES(k, n) {
+      if( cnt.find(train[k]) == cnt.end()) {
+        cnt[train[k]] = 0;
+      }
+      ++cnt[train[k]];
+    }
+    EACH(cnt, it) {
+      UPTO(j, 1, it->second) {
+        r *= j;
+      }
+    }
+    
+    cout << r << endl;
+  }
   
   return 0;
 }

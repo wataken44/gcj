@@ -1,3 +1,8 @@
+
+/*
+  D.cpp
+ */
+
 #include <algorithm>
 #include <cfloat>
 #include <climits>
@@ -51,11 +56,86 @@ template<typename T> string to_s(const set<T>& v);
 template<typename F, typename S> string to_s(const pair<F,S>& v);
 template<typename K, typename V> string to_s(const map<K,V>& v);
 
-template<typename T> vector<T> read_vector(int n);
+int dec_war(list<double> p0, list<double> p1)
+{
+  p0.sort();
+  p1.sort();
+
+  int s0 = 0;
+  int s1 = 0;
+
+  while(!p0.empty()) {
+    if(p0.front() <= p1.front()) {
+      p0.pop_front();
+      p1.pop_back();
+      s1 += 1;
+    }else {
+      p0.pop_front();
+      p1.pop_front();
+      s0 += 1;
+    }
+  }
+  return s0;
+}
+
+int war(list<double> p0, list<double> p1)
+{
+  p0.sort();
+  p1.sort();
+
+  int s0 = 0;
+  int s1 = 0;
+
+  while(!p0.empty()) {
+    /*
+    double w0 = p0.front();
+    p0.pop_front();
+    */
+    double w0 = p0.back();
+    p0.pop_back();
+
+    
+    list<double>::iterator it = upper_bound(p1.begin(), p1.end(), w0);
+    if(it == p1.end()) {
+      s0 += 1;
+      p1.pop_front();
+    }else {
+      s1 += 1;
+      p1.erase(it);
+    }
+  }
+  return s0;
+}
 
 int main(int argc, char *argv[])
 {
-  
+  int t = 0;
+  cin >> t;
+
+  UPTO(tt, 1, t) {
+    cout << "Case #" << tt << ": ";
+
+    int n = 0;
+    cin >> n;
+    list<double> nao;
+    list<double> ken;
+
+    TIMES(nn, n) {
+      double tmp;
+      cin >> tmp;
+      nao.push_back(tmp);
+    }
+    TIMES(nn, n) {
+      double tmp;
+      cin >> tmp;
+      ken.push_back(tmp);
+    }
+
+    int y = dec_war(nao, ken);
+    int z = war(nao, ken);
+
+    cout << y << " " << z << endl;
+  }  
   return 0;
 }
 
@@ -68,9 +148,3 @@ template<typename T> string to_s(const list<T>& v) { ostringstream oss; oss << "
 template<typename T> string to_s(const set<T>& v) { ostringstream oss; oss << "{"; EACH(v,i) oss << to_s(*i) << ","; oss << "}"; return oss.str(); }
 template<typename F, typename S> string to_s(const pair<F,S>& v) { ostringstream oss; oss << "<" << to_s(v.first) << " " << to_s(v.second) << ">"; return oss.str(); }
 template<typename K, typename V> string to_s(const map<K,V>& v) { ostringstream oss; oss << "{"; EACH(v,i) oss << to_s(i->first) << " => " << to_s(i->second) << ","; oss << "}"; return oss.str(); }
-
-template<typename T> vector<T> read_vector(int n) {
-  vector<T> r(n);
-  TIMES(nn, n) { T tmp; cin>>tmp; r[nn] = tmp; };
-  return r;
-}
