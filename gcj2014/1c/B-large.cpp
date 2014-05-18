@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         char en = train[nn][train[nn].size() - 1];
         ull mn = mid_info(train[nn]);
 
-        //DUMP(dp[nn-1]);
+        DUMP(dp[nn-1]);
         
         EACH(dp[nn-1], it) {
           char sp = it->first.first;
@@ -160,10 +160,10 @@ int main(int argc, char *argv[])
 
           ull cp = it->second.second;
 
-          //DUMP(sn);DUMP(en);DUMP(mn);
-          //DUMP(sp);DUMP(ep);DUMP(mp);
-          //DUMP(is_connectable(sn, mn, en, sp, mp, ep));
-          //DUMP(is_connectable(sp, mp, ep, sn, mn, en));
+          DUMP(sn);DUMP(en);DUMP(mn);
+          DUMP(sp);DUMP(ep);DUMP(mp);
+          DUMP(is_connectable(sn, mn, en, sp, mp, ep));
+          DUMP(is_connectable(sp, mp, ep, sn, mn, en));
           if(is_connectable(sn, mn, en, sp, mp, ep)) {
             char sc = sn;
             char ec = ep;
@@ -191,10 +191,11 @@ int main(int argc, char *argv[])
 
         }
       }
+      
       EACH(dp[n-1], it) {
         r = ((r % mod) + (it->second.second % mod) % mod);
       }
-      //DUMP(dp[n-1]);
+      DUMP(dp[n-1]);
     }
     //DUMP(r);
 
